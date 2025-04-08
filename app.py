@@ -595,7 +595,7 @@ if __name__ == '__main__':
     with app.app_context():
         init_db()
     
-    port = int(os.environ.get('PORT', 5000))
+    port = int(os.environ.get('PORT', 5001))
     
     # Run the app, binding to the PORT environment variable if set (for cloud deployment)
     # Use host 0.0.0.0 to bind to all interfaces

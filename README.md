@@ -11,10 +11,13 @@ Uma aplicação web para monitoramento de projetos governamentais em Moçambique
 - Avaliação e comentários dos cidadãos sobre os projetos
 - Transparência nos gastos governamentais e status dos projetos
 
-## Capturas de Tela
+## Capturas de Telas
 
-### Página Inicial
-![Página Inicial](screenshots/homepage.png)
+### Criar um projecto
+![Página Inicial](screenshot/criar.png)
+
+### Visualizar um projecto
+![Página Inicial](screenshot/visualizar.png)
 
 ## Stack Tecnológica
 
@@ -43,7 +46,7 @@ Uma aplicação web para monitoramento de projetos governamentais em Moçambique
 
 4. Acesse a aplicação em seu navegador:
    ```
-   http://localhost:5000
+   http://localhost:5001
    ```
 
 ## Usuários Padrão
@@ -57,22 +60,17 @@ A aplicação vem configurada com um usuário administrador para testes:
 
 ### Para Usuários Comuns
 1. Registre-se na plataforma usando a opção "Registar"
-   ![Registro de Usuário](screenshots/register.png)
-   
 2. Faça login com suas credenciais
-   ![Login](screenshots/login.png)
-   
 3. Navegue pelos projetos na página inicial ou na seção "Projetos"
 4. Visualize detalhes dos projetos clicando no título ou na imagem
 5. Avalie projetos através da seção "Avaliações" na página de detalhes do projeto
-   ![Avaliação de Projeto](screenshots/evaluation.png)
+
 
 ### Para Administradores
 1. Faça login com credenciais de administrador
 2. Utilize o menu "Registrar Projeto" para adicionar novos projetos
 3. Preencha todos os campos obrigatórios e envie o formulário
 4. Gerencie localizações utilizando o botão "+" ao lado do seletor de localização
-   ![Adicionar Localização](screenshots/add_location.png)
 
 ## Estrutura do Projeto
 
