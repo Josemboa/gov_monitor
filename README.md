@@ -14,10 +14,10 @@ Uma aplicação web para monitoramento de projetos governamentais em Moçambique
 ## Capturas de Telas
 
 ### Criar um projecto
-![Página Inicial](screenshot/criar.png)
+![Página Inicial](screenshots/criar.png)
 
 ### Visualizar um projecto
-![Página Inicial](screenshot/visualizar.png)
+![Página Inicial](screenshots/visualizar.png)
 
 ## Stack Tecnológica
 
