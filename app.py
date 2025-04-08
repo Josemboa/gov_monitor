@@ -595,5 +595,8 @@ if __name__ == '__main__':
     with app.app_context():
         init_db()
     
-    # Enable auto-reload on file changes
-    app.run(debug=True, use_reloader=True)
+    port = int(os.environ.get('PORT', 5000))
+    
+    # Run the app, binding to the PORT environment variable if set (for cloud deployment)
+    # Use host 0.0.0.0 to bind to all interfaces
+    app.run(host='0.0.0.0', port=port, debug=False)
