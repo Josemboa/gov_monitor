@@ -1,0 +1,448 @@
+{% extends "base.html" %}
+
+{% block title %}{{ project.title }} - GovMonitor MZ{% endblock %}
+
+{% block extra_css %}
+<style>
+    .progress-bar {
+        transition: width 1.5s ease-in-out;
+    }
+    
+    .star-rating {
+        color: #ffc107;
+    }
+    
+    .star-empty {
+        color: #e0e0e0;
+    }
+    
+    .timeline {
+        position: relative;
+        padding-left: 30px;
+    }
+    
+    .timeline::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 9px;
+        width: 2px;
+        background-color: #e9ecef;
+    }
+    
+    .timeline-item {
+        position: relative;
+        margin-bottom: 25px;
+    }
+    
+    .timeline-marker {
+        position: absolute;
+        top: 5px;
+        left: -30px;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+    }
+    
+    .timeline-content {
+        padding-bottom: 10px;
+    }
+    
+    .document-link {
+        display: flex;
+        align-items: center;
+        padding: 10px;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        margin-bottom: 10px;
+        text-decoration: none;
+        color: inherit;
+        transition: all 0.2s;
+    }
+    
+    .document-link:hover {
+        background-color: #f8f9fa;
+        border-color: #dee2e6;
+    }
+    
+    .project-header-banner {
+        height: 200px;
+        background-color: #f8f9fa;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="mb-3">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('index') }}" class="text-decoration-none">Início</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('projects') }}" class="text-decoration-none">Projetos</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ project.title }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <a href="javascript:history.back()" class="btn btn-sm btn-outline-secondary">
+            <i class="fas fa-arrow-left me-1"></i> Voltar
+        </a>
+    </div>
+    <div>
+        <button class="btn btn-sm btn-outline-success me-2">
+            <i class="fas fa-share-alt me-1"></i> Compartilhar
+        </button>
+        <button class="btn btn-sm btn-outline-danger">
+            <i class="fas fa-flag me-1"></i> Reportar Problema
+        </button>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Main Content Column -->
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="project-header-banner">
+                <i class="fas fa-building fa-4x text-secondary"></i>
+            </div>
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                    <span class="badge bg-light text-success rounded-pill d-flex align-items-center me-2">
+                        <span class="bg-success rounded-circle me-1" style="width: 8px; height: 8px;"></span>
+                        {{ project.category.name }}
+                    </span>
+                    
+                    {% if project.status.name == 'Em andamento' %}
+                    <span class="badge bg-success-subtle text-success rounded-pill d-flex align-items-center py-2">
+                        <span class="bg-success rounded-circle me-1" style="width: 8px; height: 8px;"></span>
+                        Em andamento
+                    </span>
+                    {% elif project.status.name == 'Prazo expirado' %}
+                    <span class="badge bg-danger-subtle text-danger rounded-pill d-flex align-items-center py-2">
+                        <span class="bg-danger rounded-circle me-1" style="width: 8px; height: 8px;"></span>
+                        Prazo expirado
+                    </span>
+                    {% else %}
+                    <span class="badge bg-secondary-subtle text-secondary rounded-pill d-flex align-items-center py-2">
+                        <span class="bg-secondary rounded-circle me-1" style="width: 8px; height: 8px;"></span>
+                        {{ project.status.name }}
+                    </span>
+                    {% endif %}
+                </div>
+                
+                <h1 class="fs-2 mb-4">{{ project.title }}</h1>
+                
+                <div class="mb-4">
+                    <h5 class="mb-3">Descrição</h5>
+                    <p>{{ project.description }}</p>
+                </div>
+                
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-center mb-3">
+                            <i class="fas fa-calendar me-2 text-muted"></i>
+                            <div>
+                                <p class="mb-0 small text-muted">Início</p>
+                                <p class="mb-0 fw-medium">{{ project.start_date.strftime('%d/%m/%Y') }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-center mb-3">
+                            <i class="fas fa-calendar-check me-2 text-muted"></i>
+                            <div>
+                                <p class="mb-0 small text-muted">Previsão de Término</p>
+                                <p class="mb-0 fw-medium">{{ project.end_date.strftime('%d/%m/%Y') }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-center mb-3">
+                            <i class="fas fa-coins me-2 text-muted"></i>
+                            <div>
+                                <p class="mb-0 small text-muted">Orçamento</p>
+                                <p class="mb-0 fw-medium">MT {{ "{:,.2f}".format(project.budget) }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-center mb-3">
+                            <i class="fas fa-money-bill-wave me-2 text-muted"></i>
+                            <div>
+                                <p class="mb-0 small text-muted">Gasto até o momento</p>
+                                <p class="mb-0 fw-medium">MT {{ "{:,.2f}".format(project.budget_spent) }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <p class="fw-medium mb-1">Progresso</p>
+                    <div class="progress mb-2" style="height: 10px;">
+                        <div class="progress-bar bg-success" role="progressbar" 
+                             style="width: {{ project.progress_percentage }}%;" 
+                             aria-valuenow="{{ project.progress_percentage }}" 
+                             aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                    <div class="d-flex justify-content-between small text-muted">
+                        <span>{{ project.progress_percentage|round|int }}% concluído</span>
+                        <span>Meta: 100%</span>
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-building me-2 text-muted"></i>
+                            <div>
+                                <p class="mb-0 small text-muted">Órgão Responsável</p>
+                                <p class="mb-0 fw-medium">{{ project.responsible_entity if project.responsible_entity else "Ministério da Saúde" }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-user-tie me-2 text-muted"></i>
+                            <div>
+                                <p class="mb-0 small text-muted">Gestor do Projeto</p>
+                                <p class="mb-0 fw-medium">{{ project.project_manager if project.project_manager else "Dr. António Machava" }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tabs for Project Details, Evaluations, and Comments -->
+        <ul class="nav nav-pills nav-fill mb-4">
+            <li class="nav-item">
+                <a class="nav-link active" id="gallery-tab" data-bs-toggle="pill" href="#gallery">Galeria</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="evaluations-tab" data-bs-toggle="pill" href="#evaluations">Avaliações</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="comments-tab" data-bs-toggle="pill" href="#comments">Comentários</a>
+            </li>
+        </ul>
+        
+        <div class="tab-content">
+            <!-- Gallery Tab -->
+            <div class="tab-pane fade show active" id="gallery">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="mb-4">Galeria do Projeto</h5>
+                        
+                        <div class="row">
+                            {% for i in range(3) %}
+                            <div class="col-md-4 mb-3">
+                                <div class="bg-light rounded text-center p-5">
+                                    <i class="fas fa-image fa-2x text-secondary"></i>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        
+                        {% if current_user.is_authenticated %}
+                        <div class="text-center mt-3">
+                            <button class="btn btn-outline-success">
+                                <i class="fas fa-upload me-1"></i> Enviar Fotos
+                            </button>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Evaluations Tab -->
+            <div class="tab-pane fade" id="evaluations">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h5 class="mb-0">Avaliações Cidadãs</h5>
+                            {% if current_user.is_authenticated %}
+                            <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#evaluationModal">
+                                Avaliar este projeto
+                            </button>
+                            {% endif %}
+                        </div>
+                        
+                        {% if evaluations %}
+                            {% for evaluation in evaluations %}
+                            <div class="border-bottom pb-3 mb-3">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <h6 class="mb-1">{{ evaluation.author.username }}</h6>
+                                    <div class="star-rating">
+                                        {% for i in range(5) %}
+                                            {% if i < evaluation.rating %}
+                                            <i class="fas fa-star"></i>
+                                            {% else %}
+                                            <i class="far fa-star star-empty"></i>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                <p class="small text-muted mb-2">{{ evaluation.created_at.strftime('%d/%m/%Y') }}</p>
+                                <p class="mb-0">{{ evaluation.comment }}</p>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="text-center py-5">
+                                <i class="fas fa-star fa-3x text-muted mb-3"></i>
+                                <h5>Seja o primeiro a avaliar</h5>
+                                <p class="text-muted">Compartilhe sua opinião sobre este projeto governamental</p>
+                                {% if current_user.is_authenticated %}
+                                <button class="btn btn-success mt-2" data-bs-toggle="modal" data-bs-target="#evaluationModal">
+                                    Avaliar este projeto
+                                </button>
+                                {% else %}
+                                <a href="{{ url_for('login') }}" class="btn btn-outline-success mt-2">
+                                    Entre para avaliar
+                                </a>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Comments Tab -->
+            <div class="tab-pane fade" id="comments">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="mb-4">Comentários</h5>
+                        
+                        <div class="text-center py-5">
+                            <i class="fas fa-comments fa-3x text-muted mb-3"></i>
+                            <h5>Nenhum comentário ainda</h5>
+                            <p class="text-muted">Seja o primeiro a comentar sobre este projeto</p>
+                            {% if current_user.is_authenticated %}
+                            <div class="mt-3">
+                                <textarea class="form-control mb-2" rows="3" placeholder="Escreva seu comentário..."></textarea>
+                                <button class="btn btn-success">Comentar</button>
+                            </div>
+                            {% else %}
+                            <a href="{{ url_for('login') }}" class="btn btn-outline-success mt-2">
+                                Entre para comentar
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Sidebar Column -->
+    <div class="col-md-4">
+        <!-- Project Map -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title">Mapa do projeto</h5>
+                <div class="bg-light rounded text-center p-5 mb-2">
+                    <i class="fas fa-map-marker-alt fa-3x text-secondary"></i>
+                </div>
+                <p class="small text-muted text-center">Clique no mapa para ver a localização exata do projeto.</p>
+            </div>
+        </div>
+        
+        <!-- Citizen Evaluation Summary -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title mb-3">Avaliação Cidadã</h5>
+                <div class="d-flex align-items-center mb-3">
+                    <div class="star-rating me-2">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="far fa-star star-empty"></i>
+                    </div>
+                    <div>
+                        <span class="fw-bold">4.2</span>
+                        <span class="text-muted">(128 avaliações)</span>
+                    </div>
+                </div>
+                
+                <a href="#evaluations-tab" class="btn btn-success w-100" onclick="document.getElementById('evaluations-tab').click()">
+                    Avaliar este projeto
+                </a>
+            </div>
+        </div>
+        
+        <!-- Project Documents -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title mb-3">Documentos do Projeto</h5>
+                
+                <a href="#" class="document-link">
+                    <i class="fas fa-file-contract text-secondary me-3"></i>
+                    <span>Contrato de Licitação</span>
+                </a>
+                
+                <a href="#" class="document-link">
+                    <i class="fas fa-file-alt text-secondary me-3"></i>
+                    <span>Plano de Execução</span>
+                </a>
+                
+                <a href="#" class="document-link">
+                    <i class="fas fa-file-pdf text-secondary me-3"></i>
+                    <span>Relatório de Impacto Ambiental</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Evaluation Modal -->
+<div class="modal fade" id="evaluationModal" tabindex="-1" aria-labelledby="evaluationModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="evaluationModalLabel">Avaliar Projeto</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{{ url_for('submit_evaluation', project_id=project.id) }}" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Sua avaliação</label>
+                        <div class="star-rating-input mb-2">
+                            <div class="btn-group" role="group">
+                                {% for i in range(1, 6) %}
+                                <input type="radio" class="btn-check" name="rating" id="star{{ i }}" value="{{ i }}" autocomplete="off" {% if i == 5 %}checked{% endif %}>
+                                <label class="btn btn-outline-warning" for="star{{ i }}">{{ i }}</label>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="comment" class="form-label">Seu comentário</label>
+                        <textarea class="form-control" id="comment" name="comment" rows="4" placeholder="Compartilhe sua opinião sobre este projeto..." required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success">Enviar Avaliação</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize any JavaScript functionality here
+    });
+</script>
+{% endblock %}

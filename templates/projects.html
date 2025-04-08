@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+
+{% block title %}Projetos - GovMonitor MZ{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="mb-0">Projetos</h2>
+    {% if current_user.is_authenticated and current_user.is_admin %}
+    <a href="{{ url_for('register_project') }}" class="btn btn-success">
+        <i class="fas fa-plus me-1"></i> Registar Projeto
+    </a>
+    {% endif %}
+</div>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-3">
+                <label class="form-label">Categoria</label>
+                <select id="category-filter" class="form-select">
+                    <option value="">Todas Categorias</option>
+                    {% for category in categories %}
+                    <option value="{{ category.id }}" {% if selected_category == category.id %}selected{% endif %}>
+                        {{ category.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Estado</label>
+                <select id="status-filter" class="form-select">
+                    <option value="">Todos Estados</option>
+                    {% for status in statuses %}
+                    <option value="{{ status.id }}" {% if selected_status == status.id %}selected{% endif %}>
+                        {{ status.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Pesquisar</label>
+                <div class="input-group">
+                    <input type="text" id="search-input" class="form-control" placeholder="Nome do projeto...">
+                    <button class="btn btn-outline-secondary" type="button">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" id="projects-container">
+    {% for project in projects %}
+    <div class="col-md-4 mb-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body">
+                <div class="d-flex justify-content-between mb-3">
+                    <span class="badge bg-light text-success rounded-pill d-flex align-items-center">
+                        <span class="bg-success rounded-circle me-1" style="width: 8px; height: 8px;"></span>
+                        {{ project.category.name }}
+                    </span>
+                    <span class="badge bg-dark text-white">MT {{ (project.budget / 1000000)|round|int }}M</span>
+                </div>
+                
+                <a href="{{ url_for('project_detail', project_id=project.id) }}" class="text-decoration-none">
+                    <div class="project-thumbnail bg-light d-flex align-items-center justify-content-center rounded mb-3" style="height: 140px;">
+                        <i class="fas fa-file-alt text-secondary fa-3x"></i>
+                    </div>
+                </a>
+                
+                <div class="d-flex align-items-center mb-3">
+                    {% if project.status.name == 'Em andamento' %}
+                    <span class="badge bg-success-subtle text-success rounded-pill d-flex align-items-center py-2">
+                        <span class="bg-success rounded-circle me-1" style="width: 8px; height: 8px;"></span>
+                        Em andamento
+                    </span>
+                    {% elif project.status.name == 'Prazo expirado' %}
+                    <span class="badge bg-danger-subtle text-danger rounded-pill d-flex align-items-center py-2">
+                        <span class="bg-danger rounded-circle me-1" style="width: 8px; height: 8px;"></span>
+                        Prazo expirado
+                    </span>
+                    {% elif project.status.name == 'Concluído' %}
+                    <span class="badge bg-info-subtle text-info rounded-pill d-flex align-items-center py-2">
+                        <span class="bg-info rounded-circle me-1" style="width: 8px; height: 8px;"></span>
+                        Concluído
+                    </span>
+                    {% else %}
+                    <span class="badge bg-secondary-subtle text-secondary rounded-pill d-flex align-items-center py-2">
+                        <span class="bg-secondary rounded-circle me-1" style="width: 8px; height: 8px;"></span>
+                        {{ project.status.name }}
+                    </span>
+                    {% endif %}
+                </div>
+                
+                <h5 class="card-title mb-2">
+                    <a href="{{ url_for('project_detail', project_id=project.id) }}" class="text-decoration-none text-dark">
+                        {{ project.title }}
+                    </a>
+                </h5>
+                
+                <div class="d-flex align-items-center text-muted small">
+                    <span class="text-danger me-1">●</span>
+                    {{ project.location.name }}, MZ
+                </div>
+            </div>
+            
+            <div class="card-footer bg-white border-top-0">
+                <div class="progress" style="height: 5px;">
+                    <div class="progress-bar bg-success" role="progressbar" style="width: {{ project.progress_percentage }}%;" 
+                         aria-valuenow="{{ project.progress_percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+                <div class="d-flex justify-content-between mt-2 small text-muted">
+                    <span>Progresso: {{ project.progress_percentage|round|int }}%</span>
+                    <span>{{ project.end_date.strftime('%d/%m/%Y') }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% if not projects %}
+<div class="text-center py-5">
+    <i class="fas fa-folder-open fa-4x text-muted mb-3"></i>
+    <h4>Nenhum projeto encontrado</h4>
+    <p class="text-muted">Ajuste os filtros ou tente uma pesquisa diferente.</p>
+</div>
+{% endif %}
+
+<nav>
+    <ul class="pagination justify-content-center">
+        <li class="page-item disabled">
+            <a class="page-link" href="#" tabindex="-1">Anterior</a>
+        </li>
+        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+        <li class="page-item"><a class="page-link" href="#">2</a></li>
+        <li class="page-item"><a class="page-link" href="#">3</a></li>
+        <li class="page-item">
+            <a class="page-link" href="#">Próximo</a>
+        </li>
+    </ul>
+</nav>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const categoryFilter = document.getElementById('category-filter');
+        const statusFilter = document.getElementById('status-filter');
+        
+        // Handle filter changes
+        categoryFilter.addEventListener('change', applyFilters);
+        statusFilter.addEventListener('change', applyFilters);
+        
+        function applyFilters() {
+            const categoryId = categoryFilter.value;
+            const statusId = statusFilter.value;
+            
+            let url = '{{ url_for("projects") }}';
+            const params = [];
+            
+            if (categoryId) params.push(`category=${categoryId}`);
+            if (statusId) params.push(`status=${statusId}`);
+            
+            if (params.length > 0) {
+                url += '?' + params.join('&');
+            }
+            
+            window.location.href = url;
+        }
+    });
+</script>
+{% endblock %}

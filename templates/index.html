@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h1 class="display-5 fw-bold">
+            <span class="text-success">Monitoramento de Projetos</span>
+            <span class="text-warning">Governamentais</span>
+        </h1>
+        <p class="text-muted">
+            Acompanhe, avalie e contribua para a transparência dos projetos e processos do governo de Moçambique.
+        </p>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <!-- Active Projects Card -->
+    <div class="col-md-3">
+        <div class="card h-100 bg-success text-white rounded">
+            <div class="card-body position-relative">
+                <h6 class="card-subtitle mb-2">Projetos Ativos</h6>
+                <h2 class="display-4 fw-bold">{{ active_projects }}</h2>
+                <p class="small mb-0">+{{ new_projects_this_month }} este mês</p>
+                <i class="fas fa-file-alt position-absolute top-0 end-0 m-3 opacity-25 fa-2x"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Evaluations Card -->
+    <div class="col-md-3">
+        <div class="card h-100 bg-warning text-white rounded">
+            <div class="card-body position-relative">
+                <h6 class="card-subtitle mb-2">Avaliações</h6>
+                <h2 class="display-4 fw-bold">{{ evaluations_count }}</h2>
+                <p class="small mb-0">{{ '+' if evaluation_difference > 0 else '' }}{{ evaluation_difference }} que o mês anterior</p>
+                <i class="fas fa-chart-bar position-absolute top-0 end-0 m-3 opacity-25 fa-2x"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Completed Projects Card -->
+    <div class="col-md-3">
+        <div class="card h-100 bg-danger text-white rounded">
+            <div class="card-body position-relative">
+                <h6 class="card-subtitle mb-2">Projetos Concluídos</h6>
+                <h2 class="display-4 fw-bold">{{ completed_projects }}</h2>
+                <p class="small mb-0">{{ completion_rate|round|int }}% taxa de conclusão</p>
+                <i class="fas fa-file-alt position-absolute top-0 end-0 m-3 opacity-25 fa-2x"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Total Budget Card -->
+    <div class="col-md-3">
+        <div class="card h-100 bg-dark text-white rounded">
+            <div class="card-body position-relative">
+                <h6 class="card-subtitle mb-2">Orçamento Total</h6>
+                <h2 class="display-4 fw-bold">MT {{ (total_budget / 1000000000)|round(1) }}B</h2>
+                <p class="small mb-0">MT {{ (total_spent / 1000000)|round|int }}M utilizados</p>
+                <i class="fas fa-clock position-absolute top-0 end-0 m-3 opacity-25 fa-2x"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-8">
+        <div class="d-flex mb-3">
+            <div class="btn-group me-auto">
+                <a href="{{ url_for('projects') }}" class="btn btn-sm btn-light active">Todos os estados</a>
+                <a href="{{ url_for('projects', status=expired_status.id) }}" class="btn btn-sm btn-light">Prazo expirado</a>
+                <a href="{{ url_for('projects', status=paralyzed_status.id) }}" class="btn btn-sm btn-light">Paralisados</a>
+                <a href="#" class="btn btn-sm btn-light">Orçamento excedido</a>
+                <a href="{{ url_for('projects', status=not_started_status.id) }}" class="btn btn-sm btn-light">Não iniciados</a>
+            </div>
+            <div class="ms-auto">
+                <button class="btn btn-sm btn-outline-secondary">
+                    <i class="fas fa-filter me-1"></i> Filtrar
+                </button>
+                {% if current_user.is_authenticated and current_user.is_admin %}
+                <a href="{{ url_for('register_project') }}" class="btn btn-sm btn-success ms-2">
+                    <i class="fas fa-plus me-1"></i> Registar Projeto
+                </a>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="btn-group mb-4">
+            <a href="{{ url_for('projects') }}" class="btn btn-success">Todos</a>
+            {% for category in categories %}
+            <a href="{{ url_for('projects', category=category.id) }}" class="btn btn-outline-secondary">{{ category.name }}</a>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    {% for category in categories %}
+    {% for project in recent_projects[category.name][:1] %}
+    <div class="col-md-4 mb-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body">
+                <div class="d-flex justify-content-between mb-3">
+                    <span class="badge bg-light text-success rounded-pill d-flex align-items-center">
+                        <span class="bg-success rounded-circle me-1" style="width: 8px; height: 8px;"></span>
+                        {{ category.name }}
+                    </span>
+                    <span class="badge bg-dark text-white">MT {{ (project.budget / 1000000)|round|int }}M</span>
+                </div>
+                
+                <a href="{{ url_for('project_detail', project_id=project.id) }}" class="text-decoration-none">
+                    <div class="project-thumbnail bg-light d-flex align-items-center justify-content-center rounded mb-3" style="height: 140px;">
+                        <i class="fas fa-file-alt text-secondary fa-3x"></i>
+                    </div>
+                </a>
+                
+                <div class="d-flex align-items-center mb-3">
+                    {% if project.status.name == 'Em andamento' %}
+                    <span class="badge bg-success-subtle text-success rounded-pill d-flex align-items-center py-2">
+                        <span class="bg-success rounded-circle me-1" style="width: 8px; height: 8px;"></span>
+                        Em andamento
+                    </span>
+                    {% elif project.status.name == 'Prazo expirado' %}
+                    <span class="badge bg-danger-subtle text-danger rounded-pill d-flex align-items-center py-2">
+                        <span class="bg-danger rounded-circle me-1" style="width: 8px; height: 8px;"></span>
+                        Prazo expirado
+                    </span>
+                    {% else %}
+                    <span class="badge bg-secondary-subtle text-secondary rounded-pill d-flex align-items-center py-2">
+                        <span class="bg-secondary rounded-circle me-1" style="width: 8px; height: 8px;"></span>
+                        {{ project.status.name }}
+                    </span>
+                    {% endif %}
+                </div>
+                
+                <h5 class="card-title mb-2">
+                    <a href="{{ url_for('project_detail', project_id=project.id) }}" class="text-decoration-none text-dark">
+                        {{ project.title }}
+                    </a>
+                </h5>
+                
+                <div class="d-flex align-items-center text-muted small">
+                    <span class="text-danger me-1">●</span>
+                    {{ project.location.name }}, MZ
+                </div>
+            </div>
+            
+            <div class="card-footer bg-white border-top-0">
+                <div class="progress" style="height: 5px;">
+                    <div class="progress-bar bg-success" role="progressbar" style="width: {{ project.progress_percentage }}%;" 
+                         aria-valuenow="{{ project.progress_percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+                <div class="d-flex justify-content-between mt-2 small text-muted">
+                    <span>Progresso: {{ project.progress_percentage|round|int }}%</span>
+                    <span>{{ project.end_date.strftime('%d/%m/%Y') }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+    {% endfor %}
+</div>
+
+<div class="text-center mt-4">
+    <a href="{{ url_for('projects') }}" class="btn btn-outline-success">Ver Todos os Projetos</a>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add any homepage specific JavaScript here
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,231 @@
+{% extends "base.html" %}
+
+{% block title %}Registar Novo Projeto - GovMonitor MZ{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center mb-4">
+    <a href="{{ url_for('index') }}" class="text-decoration-none text-muted me-3">
+        <i class="fas fa-arrow-left"></i> Voltar para a página inicial
+    </a>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header bg-success text-white py-3">
+        <h3 class="mb-0">Registar Novo Projeto ou Promessa</h3>
+        <p class="mb-0 mt-1">Preencha os detalhes do projeto governamental para monitoramento e avaliação pública</p>
+    </div>
+    
+    <div class="card-body">
+        <form method="POST" action="{{ url_for('register_project') }}" enctype="multipart/form-data">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            
+            <div class="row mb-4">
+                <div class="col-md-12 mb-3">
+                    <label for="title" class="form-label">Título do Projeto *</label>
+                    <input type="text" class="form-control" id="title" name="title" placeholder="Ex: Construção do Hospital Provincial de Maputo" required>
+                </div>
+                
+                <div class="col-md-12 mb-3">
+                    <label for="description" class="form-label">Descrição *</label>
+                    <textarea class="form-control" id="description" name="description" rows="5" placeholder="Descreva o projeto em detalhes..." required></textarea>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="category" class="form-label">Categoria *</label>
+                    <select class="form-select" id="category" name="category_id" required>
+                        <option value="" selected disabled>Selecione uma categoria</option>
+                        {% for category in categories %}
+                        <option value="{{ category.id }}">{{ category.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="location" class="form-label">Localização *</label>
+                    <div class="d-flex">
+                        <select class="form-select" id="location" name="location_id" required>
+                            <option value="" selected disabled>Selecione uma localização</option>
+                            {% for location in locations %}
+                            <option value="{{ location.id }}">{{ location.name }}, {{ location.region }}</option>
+                            {% endfor %}
+                        </select>
+                        <div class="dropdown ms-2">
+                            <button class="btn btn-outline-success dropdown-toggle" type="button" id="addLocationDropdown" data-bs-toggle="dropdown" aria-expanded="false" title="Adicionar localização">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="addLocationDropdown">
+                                <li><a class="dropdown-item" href="{{ url_for('add_location', location_name='Tete', region='Centro') }}">Tete (Centro)</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('add_location', location_name='Pemba', region='Norte') }}">Pemba (Norte)</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('add_location', location_name='Inhambane', region='Sul') }}">Inhambane (Sul)</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#addLocationModal">Outra localização...</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="start_date" class="form-label">Data de Anúncio *</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-calendar"></i></span>
+                        <input type="date" class="form-control" id="start_date" name="start_date" required>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="end_date" class="form-label">Data de Conclusão Prevista *</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-calendar"></i></span>
+                        <input type="date" class="form-control" id="end_date" name="end_date" required>
+                    </div>
+                </div>
+                
+                <div class="col-md-12 mb-3">
+                    <label for="budget" class="form-label">Orçamento Anunciado (MT) *</label>
+                    <div class="input-group">
+                        <span class="input-group-text">MT</span>
+                        <input type="number" step="0.01" min="0" class="form-control" id="budget" name="budget" placeholder="Ex: 45000000" required>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mb-4">
+                <div class="col-md-12 mb-3">
+                    <h5>Entidade Responsável *</h5>
+                </div>
+                
+                <div class="col-md-12 mb-3">
+                    <input type="text" class="form-control" id="responsible_entity" name="responsible_entity" placeholder="Ex: Ministério da Saúde" required>
+                </div>
+                
+                <div class="col-md-12 mb-3">
+                    <h5>Gestor do Projeto (ou autoridade)</h5>
+                </div>
+                
+                <div class="col-md-12 mb-3">
+                    <input type="text" class="form-control" id="project_manager" name="project_manager" placeholder="Ex: Dr. António Machava">
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="contact_email" class="form-label">Email de Contato</label>
+                    <input type="email" class="form-control" id="contact_email" name="contact_email" placeholder="Ex: contato@ministerio.gov.mz">
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="contact_phone" class="form-label">Telefone de Contato</label>
+                    <input type="text" class="form-control" id="contact_phone" name="contact_phone" placeholder="Ex: +258 21 123456">
+                </div>
+            </div>
+            
+            <div class="row mb-4">
+                <div class="col-md-12 mb-3">
+                    <h5>Fontes e Evidências</h5>
+                    <p class="text-muted small">Adicione fontes que comprovem a existência e o estado atual do projeto (links de notícias, fotos, documentos oficiais, etc.)</p>
+                </div>
+                
+                <div class="col-md-10 mb-3">
+                    <div class="input-group">
+                        <span class="input-group-text">Link</span>
+                        <input type="url" class="form-control" id="evidence_link" name="evidence_link" placeholder="https://exemplo.com/noticia">
+                    </div>
+                </div>
+                
+                <div class="col-md-2">
+                    <button type="button" class="btn btn-outline-success w-100">
+                        <i class="fas fa-plus me-2"></i> Adicionar Fonte
+                    </button>
+                </div>
+                
+                <div class="col-md-12 mt-2">
+                    <p class="text-muted small fst-italic">Fornecer fontes confiáveis ajuda a verificar a autenticidade do projeto e aumenta a credibilidade do registro.</p>
+                </div>
+            </div>
+            
+            <div class="row mb-4">
+                <div class="col-md-12 mb-3">
+                    <label for="status" class="form-label">Estado Atual *</label>
+                    <select class="form-select" id="status" name="status_id" required>
+                        <option value="" selected disabled>Selecione o estado atual</option>
+                        {% for status in statuses %}
+                        <option value="{{ status.id }}">{{ status.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            
+            <div class="row mb-4">
+                <div class="col-md-12">
+                    <div class="card bg-light border-0">
+                        <div class="card-body">
+                            <h5 class="card-title mb-3">Informação Importante</h5>
+                            <p class="card-text">Ao registar um projeto, você está contribuindo para a transparência governamental. Todas as informações serão verificadas pela nossa equipe antes de serem publicadas. Forneça o máximo de detalhes possível, se disponível, inclua links para fontes oficiais.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-auto">
+                    <button type="button" class="btn btn-outline-secondary">Cancelar</button>
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-success">Registar Projeto</button>
+                </div>
+            </div>
+            
+        </form>
+    </div>
+</div>
+
+<!-- Add Location Modal -->
+<div class="modal fade" id="addLocationModal" tabindex="-1" aria-labelledby="addLocationModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addLocationModalLabel">Adicionar Nova Localização</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="addLocationForm" action="#" method="GET">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="new_location_name" class="form-label">Nome da Localização</label>
+                        <input type="text" class="form-control" id="new_location_name" name="new_location_name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="new_location_region" class="form-label">Região</label>
+                        <select class="form-select" id="new_location_region" name="new_location_region" required>
+                            <option value="" selected disabled>Selecione uma região</option>
+                            <option value="Norte">Norte</option>
+                            <option value="Centro">Centro</option>
+                            <option value="Sul">Sul</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" id="submitNewLocation" class="btn btn-success">Adicionar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add form validation and dynamic form elements handling here
+        
+        // Handle custom location addition
+        document.getElementById('submitNewLocation').addEventListener('click', function() {
+            const locationName = document.getElementById('new_location_name').value;
+            const locationRegion = document.getElementById('new_location_region').value;
+            
+            if (locationName && locationRegion) {
+                window.location.href = "{{ url_for('add_location', location_name='placeholder', region='placeholder') }}"
+                    .replace('placeholder/placeholder', encodeURIComponent(locationName) + '/' + encodeURIComponent(locationRegion));
+            }
+        });
+    });
+</script>
+{% endblock %}
