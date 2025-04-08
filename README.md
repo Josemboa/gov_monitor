@@ -21,7 +21,7 @@ Uma aplicação web para monitoramento de projetos governamentais em Moçambique
 
 ## Stack Tecnológica
 
-- Python com framework Flask
+- Python 3.10.11 com framework Flask
 - Banco de dados SQLite com SQLAlchemy ORM
 - Bootstrap 5 para interface responsiva
 - Sistema de autenticação para usuários e administradores
