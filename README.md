@@ -30,7 +30,7 @@ Uma aplicação web para monitoramento de projetos governamentais em Moçambique
 
 1. Clone este repositório:
    ```
-   git clone https://github.com/seu-usuario/govmonitor-mz.git
+   git clone https://github.com/Josemboa/gov_monitor.git
    cd govmonitor-mz
    ```
 
